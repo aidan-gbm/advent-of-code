@@ -1,14 +1,40 @@
 from sys import argv
 
+
+def day1_1(in_file):
+    data = [int(line) for line in open(in_file)]
+    return sum([a > b for a, b in zip(data[1:], data)])
+
+def day1_2(in_file):
+    data = [int(line) for line in open(in_file)]
+    windows = list(map(sum, zip(data, data[1:], data[2:])))
+    return sum([a > b for a, b in zip(windows[1:], windows)])
+
+
+def day2_1(in_file):
+    data = [(a, int(b)) for a, b in [x.split() for x in open(in_file)]]
+    pos = sum([b for a, b in data if a == 'forward'])
+    depth = sum([-b if a == 'up' else b if a == 'down' else 0 for a, b in data])
+    return pos * depth
+
+def day2_2(in_file):
+    data = [(a, int(b)) for a, b in [x.split() for x in open(in_file)]]
+    aim = pos = dep = 0
+    for d, n in data:
+        aim = aim + n if d[0] == 'd' else aim - n if d[0] == 'u' else aim
+        dep = dep + aim * n if d[0] == 'f' else dep
+        pos = pos + n if d[0] == 'f' else pos
+    return pos * dep
+
+
 def day3_mcb(nums, idx):
     return int(sum([int(num[idx]) for num in nums]) >= (len(nums) / 2))
 
 def day3_1(in_file):
     data = [line.strip() for line in open(in_file)]
-    track = [sum(x) for x in zip(*[[int(bit) for bit in line] for line in data])]
-    g = sum([(bit > (len(data) + 1) / 2) << len(data[0]) - sig - 1 for sig, bit in enumerate(track)])
-    e = sum([(bit < (len(data) + 1) / 2) << len(data[0]) - sig - 1 for sig, bit in enumerate(track)])
-    print(f'Gamma: {g}, Epsilon: {e}, Answer: {g * e}')
+    g = sum([b << i for i, b in enumerate([day3_mcb(data, j) for j in range(len(data[0]))][::-1])])
+    e = sum([b << i for i, b in enumerate([int(not day3_mcb(data, j)) for j in range(len(data[0]))][::-1])])
+    return g * e
 
 def day3_2(in_file):
     oxy = [line.strip() for line in open(in_file)]
@@ -22,13 +48,15 @@ def day3_2(in_file):
             co2 = list(filter(lambda x: int(x[idx]) == lcb, co2))
     oxy = sum([int(bit) << idx for idx, bit in enumerate(oxy[0][::-1])])
     co2 = sum([int(bit) << idx for idx, bit in enumerate(co2[0][::-1])])
-    print(oxy, co2, oxy * co2)
+    return oxy * co2
+
 
 if __name__ == '__main__':
     if len(argv) == 3:
         func = f'day{argv[1]}_{argv[2]}'
         if func in locals():
-            locals()[func](f'day{argv[1]}.txt')
+            ans = locals()[func](f'day{argv[1]}.txt')
+            print(f'Day {argv[1]}.{argv[2]}:', ans)
         else:
             print('That problem hasn\'t been completed yet!')
     else:
