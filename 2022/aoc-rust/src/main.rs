@@ -61,6 +61,72 @@ fn day2(data: String) {
     println!("Part 2: {}", score2);
 }
 
+fn day3(data: String) {
+    let rucksacks = data.split("\n");
+
+    let mut first = "";
+    let mut sum1: u32 = 0;
+    let mut sum2: u32 = 0;
+    let mut common: Vec<char> = Vec::new();
+    for (idx, ruck) in rucksacks.enumerate() {
+        let div = ruck.len() / 2;
+        let parts = ruck.split_at(div);
+
+        // Part 1
+        let mut item: Option<char> = None;
+        for chr in parts.0.chars() {
+            match parts.1.find(|c| c == chr) {
+                Some(_) => {
+                    item = Some(chr);
+                    break;
+                },
+                None => continue
+            }
+        }
+
+        let item = item.unwrap();
+        if item as u8 <= b'Z' {
+            sum1 += item as u32 - 38;
+        } else {
+            sum1 += item as u32 - 96;
+        }
+
+        // Part 2
+        if idx % 3 == 0 {
+            first = ruck;
+            common.clear();
+        } else if idx % 3 == 1 {
+            for chr in ruck.chars() {
+                match first.find(|c| c == chr) {
+                    Some(_) => common.push(chr),
+                    None => continue
+                }
+            }
+        } else {
+            let mut group: Option<char> = None;
+            for chr in common.clone() {
+                match ruck.find(|c| c == chr) {
+                    Some(_) => {
+                        group = Some(chr);
+                        break;
+                    },
+                    None => continue
+                }
+            }
+
+            let group = group.unwrap();
+            if group as u8 <= b'Z' {
+                sum2 += group as u32 - 38;
+            } else {
+                sum2 += group as u32 - 96;
+            }
+        }
+    }
+
+    println!("Part 1: {}", sum1);
+    println!("Part 2: {}", sum2);
+}
+
 fn main() {
     const TEST: bool = false;
     const INPUT_DIR: &str = "./input/";
@@ -75,8 +141,9 @@ fn main() {
             match day {
                 "1" => day_fn = day1,
                 "2" => day_fn = day2,
+                "3" => day_fn = day3,
                 _ => {
-                    eprintln!("Error: days 1-2 currently available");
+                    eprintln!("Error: days 1-3 currently available");
                     return;
                 }
             };
