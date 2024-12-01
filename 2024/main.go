@@ -16,11 +16,11 @@ func main() {
 			panic(err.Error())
 		}
 		p1, p2, err := days[i+1](input)
-        if err != nil {
+		if err != nil {
 			panic(err.Error())
 		}
 
-        fmt.Printf("Day %d.1: %d\n", i+1, p1)
-        fmt.Printf("Day %d.2: %d\n", i+1, p2)
+		fmt.Printf("Day %d.1: %d\n", i+1, p1)
+		fmt.Printf("Day %d.2: %d\n", i+1, p2)
 	}
 }
