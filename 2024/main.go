@@ -7,10 +7,11 @@ import (
 
 var days = map[int]func([]string) (int, int, error){
 	1: solve.Run1,
+	2: solve.Run2,
 }
 
 func main() {
-	for i := range 1 {
+	for i := range 2 {
 		input, err := solve.Load(i + 1)
 		if err != nil {
 			panic(err.Error())
