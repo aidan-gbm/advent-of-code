@@ -10,10 +10,11 @@ var days = map[int]func([]string) (int, int, error){
 	2: solve.Run2,
 	3: solve.Run3,
 	4: solve.Run4,
+	5: solve.Run5,
 }
 
 func main() {
-	for i := range 4 {
+	for i := range 5 {
 		input, err := solve.Load(i + 1)
 		if err != nil {
 			panic(err.Error())
