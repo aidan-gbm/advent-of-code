@@ -15,61 +15,18 @@ func Test7(t *testing.T) {
 		"292: 11 6 16 20",
 	}
 
+    a1, a2 := 3749, 11387
 	p1, p2, err := Run7(input)
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
 
-	if p1 != 3749 {
-		t.Errorf("Part 1: want 3749, got %d", p1)
+	if p1 != a1 {
+		t.Errorf("Part 1: want %d, got %d", a1, p1)
 	}
 
-	if p2 != 11387 {
-		t.Errorf("Part 2: want 11387, got %d", p2)
-	}
-}
-
-func Test7Perms(t *testing.T) {
-	tests := []struct {
-		items  []uint8
-		length int
-		perms  [][]uint8
-	}{
-		{[]uint8{1, 2}, 1, [][]uint8{
-			{1},
-			{2},
-		}},
-		{[]uint8{1, 2}, 2, [][]uint8{
-			{1, 1},
-			{1, 2},
-			{2, 1},
-			{2, 2},
-		}},
-		{[]uint8{1, 2}, 3, [][]uint8{
-			{1, 1, 1},
-			{1, 1, 2},
-			{1, 2, 1},
-			{1, 2, 2},
-			{2, 1, 1},
-			{2, 1, 2},
-			{2, 2, 1},
-			{2, 2, 2},
-		}},
-	}
-
-	for ti, tt := range tests {
-		perms := permutations(tt.items, tt.length)
-		for pi, perm := range perms {
-            if len(perm) != len(tt.perms[pi]) {
-				t.Fatalf("permutation test %d.%d expected %v, got %v\n", ti, pi, tt.perms[pi], perm)
-            }
-
-			for pii, val := range perm {
-				if val != tt.perms[pi][pii] {
-					t.Errorf("permutation test %d.%d expected %v, got %v\n", ti, pi, tt.perms[pi], perm)
-				}
-			}
-		}
+	if p2 != a2 {
+		t.Errorf("Part 2: want %d, got %d", a2, p2)
 	}
 }
 

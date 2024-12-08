@@ -6,83 +6,74 @@ import (
 	"strings"
 )
 
-type p7op func(a, b int64) int64
-
 func Run7(input []string) (int, int, error) {
     var p1, p2 int
 	for _, line := range input {
 		parts := strings.Split(line, ": ")
-		nums := strings.Split(parts[1], " ")
+		numsRaw := strings.Split(parts[1], " ")
 
-        ops1 := permutations([]p7op{addOp, mulOp}, len(nums) - 1)
-        for _, ops := range ops1 {
-            total, err := strconv.ParseInt(parts[0], 0, 0)
-            if err != nil {
-                return 0, 0, err
-            }
-
-            var acc int64
-            for i, num := range nums {
-                n, err := strconv.ParseInt(num, 0, 0)
-                if err != nil {
-                    return 0, 0, err
-                }
-
-                if i == 0 {
-                    acc = n
-                } else {
-                    acc = ops[i-1](acc, n)
-                }
-            }
-
-            if total == acc {
-                p1 += int(total)
-                break
-            } else if total < acc {
-                break
-            }
+        total, err := strconv.ParseInt(parts[0], 10, 0)
+        if err != nil {
+            return 0, 0, nil
         }
 
-        ops2 := permutations([]p7op{addOp, mulOp, catOp}, len(nums) - 1)
-        for _, ops := range ops2 {
-            total, err := strconv.ParseInt(parts[0], 0, 0)
+        nums := make([]int64, 0, len(numsRaw))
+        for _, nr := range numsRaw {
+            n, err := strconv.ParseInt(nr, 10, 0)
             if err != nil {
                 return 0, 0, err
             }
 
-            var acc int64
-            for i, num := range nums {
-                n, err := strconv.ParseInt(num, 0, 0)
-                if err != nil {
-                    return 0, 0, err
-                }
+            nums = append(nums, n)
+        }
 
-                if i == 0 {
-                    acc = n
-                } else {
-                    acc = ops[i-1](acc, n)
-                }
-            }
-
-            if total == acc {
-                p2 += int(total)
-                break
-            } else if total < acc {
-                break
-            }
-
+        if calibrate(nums, total, false) {
+            p1 += int(total)
+            p2 += int(total)
+        } else if calibrate(nums, total, true) {
+            p2 += int(total)
         }
 	}
 
 	return p1, p2, nil
 }
 
-func addOp(a, b int64) int64 {
-	return a + b
-}
+func calibrate(nums []int64, total int64, cat bool) bool {
+    if len(nums) == 1 {
+        return nums[0] == total
+    } else if nums[0] > total {
+        return false
+    }
 
-func mulOp(a, b int64) int64 {
-	return a * b
+    newNums := make([]int64, 0, len(nums) - 1)
+
+    // Try: add
+    next := nums[0] + nums[1]
+    newNums = append(newNums, next)
+    newNums = append(newNums, nums[2:]...)
+    if calibrate(newNums, total, cat) {
+        return true
+    }
+    newNums = newNums[:0]
+
+    // Try: multiply
+    next = nums[0] * nums[1]
+    newNums = append(newNums, next)
+    newNums = append(newNums, nums[2:]...)
+    if calibrate(newNums, total, cat) {
+        return true
+    }
+    newNums = newNums[:0]
+
+    // Try: concatenate
+    if !cat {
+        return false
+    } else {
+        next = catOp(nums[0], nums[1])
+        newNums = append(newNums, next)
+        newNums = append(newNums, nums[2:]...)
+        return calibrate(newNums, total, cat)
+    }
 }
 
 func catOp(a, b int64) int64 {
@@ -92,23 +83,4 @@ func catOp(a, b int64) int64 {
     }
 
     return a * int64(math.Pow10(digits)) + b
-}
-
-func permutations[T any](items []T, length int) [][]T {
-	perms := make([][]T, 0, int(math.Pow(float64(len(items)), float64(length))))
-    if length == 1 {
-        for _, item := range items {
-            perms = append(perms, []T{item})
-        }
-
-        return perms
-    }
-
-    for _, item := range items {
-        for _, sub := range permutations(items, length - 1) {
-            perms = append(perms, append([]T{item}, sub...))
-        }
-    }
-
-    return perms
 }
